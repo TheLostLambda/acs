@@ -12,4 +12,4 @@ parses it to generate a conversation log in searchable, single-page, html format
 
 ## Tech
 * Common Lisp (SBCL)
-* SQL Library (cl-yesql)
+* SQL Library (cl-dbi)
