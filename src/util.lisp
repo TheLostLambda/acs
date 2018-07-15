@@ -4,9 +4,23 @@
   "Returns only the resultant value of an assoc call"
   (cdr (assoc key alist)))
 
+(defun str-empty-p (str)
+  "Tests is a string is empty by checking its length (excluding trailing whitespace)"
+  (= (length (string-trim " " str)) 0))
+
 (defun msg-type (msg)
   "Returns the mime type of the message it's called on"
   (lookup :|content_type| msg))
+
+(defun resolve-media (uri)
+  "Takes a remote uri and returns the local path to that media object."
+  (let ((safe-uri (format-uri uri)))
+    (if (pathname-type safe-uri)
+	(probe-file (merge-pathnames (file-namestring safe-uri) *media-dir*))
+	(flet ((type-path (type) (merge-pathnames *media-dir* (concatenate 'string (pathname-name safe-uri) type))))
+	  (cond ((probe-file (type-path ".png")) (type-path ".png"))
+		((probe-file (type-path ".webp")) (type-path ".webp"))
+		(t nil))))))
 
 (defun format-uri (uri-str)
   "Formats content URIs so they can be fetched with adb. It drops the `file://`, decodes %-encoded characters, and replaces emulated storage paths with the actual path"
