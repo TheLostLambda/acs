@@ -3,6 +3,14 @@
 This application pulls the Allo database from an Android device over adb and then
 parses it to generate a conversation log in searchable, single-page, html format.
 
+## Todo
+* Convert animated webp to gif images
+* Use relative paths for resource links in the html
+* Add support for videos
+* Add proper CSS to format messages in an easy to read way (and hide timestamps)
+* Filter out empty messages in list-messages
+* Update docstrings
+
 ## Reverse Engineering
 * Database located at: `/data/data/com.google.android.apps.fireball/databases/fireball.db`
 * Media located at: `/sdcard/Allo/`

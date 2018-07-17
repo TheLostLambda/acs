@@ -1,6 +1,7 @@
 ;;;; This file contains the code used to generate the final html report.
 
 (defparameter *report-path* (merge-pathnames "ACS.html" *output-dir*))
+(defparameter *last-sender* nil)
 
 (defparameter *html-wrapper* '(
 "<!DOCTYPE html>
@@ -35,11 +36,19 @@
     (get-output-stream-string html-stream)))
 
 (defun msg-to-html (msg)
-  (cond ((eq (car msg) :text)
-	 (format nil "<p class=\"~A\">~A</p>~%" (if (equal (cadr msg) "Me") "right" "left") (car (last msg))))
-	((or (eq (car msg) :image) (eq (car msg) :sticker))
-	 (format nil "<p class=\"~A\"><img src=\"~A\" alt=\"COULDN'T LOCATE MEDIA\"></p>~%" (if (equal (cadr msg) "Me") "right" "left") (resolve-media (car (last msg)))))
-	(t "")))
+  (let ((html-stream (make-string-output-stream)))
+    (format html-stream "<div class=\"message-container ~A\">~%" (if (equal (cadr msg) "Me") "right" "left"))
+    (unless (or (equal (cadr msg) *last-sender*) (equal (cadr msg) "Me"))
+      (format html-stream "<p class=\"sender-name\">~A</p>~%" (cadr msg))) ; Change this so these IDs display only in group messages
+    (setf *last-sender* (cadr msg))
+    (cond ((eq (car msg) :text)
+	   (format html-stream "<p class=\"message\">~A</p>~%" (car (last msg))))
+	  ((or (eq (car msg) :image) (eq (car msg) :sticker))
+	   (format html-stream "<p><img src=\"~A\" alt=\"COULDN'T DISPLAY MEDIA\"></p>~%" (resolve-media (car (last msg)))))
+	  (t ""))
+    (format html-stream "<p class=\"timestamp\">~A</p>~%" (caddr msg))
+    (format html-stream "</div>~%")
+    (get-output-stream-string html-stream)))
 
 (defun write-to-file (report-str)
   (with-open-file (fh (ensure-directories-exist *report-path*) :direction :output :if-exists :supersede)

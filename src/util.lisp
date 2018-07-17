@@ -4,9 +4,9 @@
   "Returns only the resultant value of an assoc call"
   (cdr (assoc key alist)))
 
-(defun str-empty-p (str)
-  "Tests is a string is empty by checking its length (excluding trailing whitespace)"
-  (= (length (string-trim " " str)) 0))
+(defun ensure-string-content (str)
+  "Returns NIL if the string is empty. Returns the string otherwise."
+  (unless (= (length (string-trim " " str)) 0) str))
 
 (defun msg-type (msg)
   "Returns the mime type of the message it's called on"

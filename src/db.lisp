@@ -20,14 +20,16 @@
 (defun process-message (msg)
   "Takes a message and checks its content type before processing it appropriately"
   (cond ((equal (msg-type msg) "text/plain") (message-builder :text msg :|text|))
+	((equal (msg-type msg) "application/gbot") (message-builder :text msg :|fallback_text|))
 	((equal (msg-type msg) "application/sticker") (message-builder :sticker msg :|uri|))
-	((member (msg-type msg) '("image/jpeg" "image/png") :test #'equal) (message-builder :image msg :|uri|))
+	((member (msg-type msg) '("image/jpeg" "image/png" "image/gif") :test #'equal) (message-builder :image msg :|uri|))
 	(t (message-builder :unsupported msg :|content_type|))))
  
 (defun resolve-sender-id (sender-id)
   "Takes a sender ID, references the database, and returns the sender's name"
-  (let ((sender (fetch-sql (concatenate 'string "SELECT contact_display_name FROM fireball_users WHERE _id=" (princ-to-string sender-id)))))
-    (lookup :|contact_display_name| (car sender))))
+  (let ((sender (fetch-sql (concatenate 'string "SELECT contact_display_name,profile_display_name FROM fireball_users WHERE _id=" (princ-to-string sender-id)))))
+    (or (ensure-string-content (lookup :|contact_display_name| (car sender)))
+	(ensure-string-content (lookup :|profile_display_name| (car sender))))))
 
 (defun message-builder (type msg &rest fields)
   "Takes a type, raw message, and list of relevent fields. The then returns a list of the type and then the values of the selected fields (plus a timestamp and sender id)"

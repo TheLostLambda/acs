@@ -17,7 +17,7 @@
     (let ((uri (format-uri (car (last msg))))) 
       (ensure-directories-exist *media-dir*)
       (cond ((eq (car msg) :image)
-	     (unless (probe-file (merge-pathnames *media-dir* (file-namestring uri))) (uiop:run-program (list "adb" "pull" uri (namestring *media-dir*)) :output t)))
+	     (unless (probe-file (merge-pathnames *media-dir* (file-namestring uri))) (ignore-errors (uiop:run-program (list "adb" "pull" uri (namestring *media-dir*)) :output t))))
 	    ((eq (car msg) :sticker)
 	     (let ((temp-file (namestring (merge-pathnames *TEMP* (file-namestring uri))))
 		   (conv-file (namestring (merge-pathnames *media-dir* (concatenate 'string (pathname-name uri) ".png"))))
