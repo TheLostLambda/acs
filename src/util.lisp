@@ -14,12 +14,13 @@
 
 (defun resolve-media (uri)
   "Takes a remote uri and returns the local path to that media object."
-  (let ((safe-uri (format-uri uri)))
-    (if (pathname-type safe-uri)
-	(probe-file (merge-pathnames (file-namestring safe-uri) *media-dir*))
-	(flet ((type-path (type) (merge-pathnames *media-dir* (concatenate 'string (pathname-name safe-uri) type))))
-	  (cond ((probe-file (type-path ".png")) (type-path ".png"))
-		((probe-file (type-path ".webp")) (type-path ".webp"))
+  (let* ((safe-uri (format-uri uri))
+	 (file-type (pathname-type safe-uri)))
+    (flet ((type-path (media type) (merge-pathnames media (concatenate 'string (pathname-name safe-uri) "." type))))
+      (if file-type
+	  (when (probe-file (type-path *media-dir* file-type)) (type-path "media/" file-type))
+	  (cond ((probe-file (type-path *media-dir* "png")) (type-path "media/" "png"))
+		((probe-file (type-path *media-dir* "webp")) (type-path "media/" "webp"))
 		(t nil))))))
 
 (defun format-uri (uri-str)

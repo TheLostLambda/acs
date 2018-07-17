@@ -10,7 +10,8 @@
 (defun list-messages (convo-id)
   "Curates all of the messages that belong to a particular conversation"
   (let ((msgs (fetch-sql (concatenate 'string "SELECT * FROM messages WHERE conversation_id=" (princ-to-string convo-id)))))
-    (mapcar #'process-message msgs)))
+    (remove-if (lambda (msg) (member (car msg) '(:empty :unsupported)))
+	       (mapcar #'process-message msgs))))
 
 (defun fetch-sql (sql)
   "Takes a SQL query and returns the result in alist form"
@@ -22,7 +23,8 @@
   (cond ((equal (msg-type msg) "text/plain") (message-builder :text msg :|text|))
 	((equal (msg-type msg) "application/gbot") (message-builder :text msg :|fallback_text|))
 	((equal (msg-type msg) "application/sticker") (message-builder :sticker msg :|uri|))
-	((member (msg-type msg) '("image/jpeg" "image/png" "image/gif") :test #'equal) (message-builder :image msg :|uri|))
+	((search "image" (msg-type msg)) (message-builder :image msg :|uri|))
+	((search "video" (msg-type msg)) (message-builder :video msg :|uri|))
 	(t (message-builder :unsupported msg :|content_type|))))
  
 (defun resolve-sender-id (sender-id)
@@ -33,5 +35,8 @@
 
 (defun message-builder (type msg &rest fields)
   "Takes a type, raw message, and list of relevent fields. The then returns a list of the type and then the values of the selected fields (plus a timestamp and sender id)"
-  (let ((header (list type (resolve-sender-id (lookup :|sender_id| msg)) (unix-to-date (lookup :|received_timestamp| msg)))))
-    (append header (mapcar (lambda (sym) (lookup sym msg)) fields))))
+  (let ((header (list type (resolve-sender-id (lookup :|sender_id| msg)) (unix-to-date (lookup :|received_timestamp| msg))))
+	(body (mapcar (lambda (sym) (lookup sym msg)) fields)))
+    (if (every #'ensure-string-content body)
+	(append header body)
+	(list :empty))))

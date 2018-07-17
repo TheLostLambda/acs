@@ -13,10 +13,10 @@
 
 (defun adb-fetch-media (msg)
   "Takes a message, checks its type, then uses adb to fetch any media that it might reference"
-  (when (member (car msg) '(:image :sticker))
+  (when (member (car msg) '(:image :sticker :video))
     (let ((uri (format-uri (car (last msg))))) 
       (ensure-directories-exist *media-dir*)
-      (cond ((eq (car msg) :image)
+      (cond ((member (car msg) '(:image :video))
 	     (unless (probe-file (merge-pathnames *media-dir* (file-namestring uri))) (ignore-errors (uiop:run-program (list "adb" "pull" uri (namestring *media-dir*)) :output t))))
 	    ((eq (car msg) :sticker)
 	     (let ((temp-file (namestring (merge-pathnames *TEMP* (file-namestring uri))))
