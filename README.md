@@ -3,13 +3,15 @@
 This application pulls the Allo database from an Android device over adb and then
 parses it to generate a conversation log in searchable, single-page, html format.
 
+Currently, this program requires a rooted Android device to pull the message database.
+
 ## Todo
-* Support for date ranges in `list-messages`
-* Add dynamic text size from the :|text_size| field
-* Make timestamp reveal on click not hover
-* Fit message background to content
-* Make message colors sender dependent
+* Switch to `dbi:with-connection`
+* Support `application/pdf` with `uri` and `file_name` fields
+* Support `application/latlong` with `location_lat`, `location_lng`, and `location_address`
+* Add command line interface
 * Update docstrings
+* Reduce vertical message spacing
 * Convert animated webp to gif images
 
 ## Reverse Engineering
@@ -19,7 +21,10 @@ parses it to generate a conversation log in searchable, single-page, html format
 * Conversation information stored in the `conversations` table or `fireball.db`
 * All messages stored in the `messages` table of `fireball.db`
 
-## Tech
+## Dependencies
 * Common Lisp (SBCL)
 * SQL Library (cl-dbi)
 * URI Parsing Library (quri)
+* Regex (cl-ppcre)
+* Webp Conversion (imagemagick)
+* Phone Communication (adb)

@@ -12,6 +12,10 @@
   "Returns the mime type of the message it's called on"
   (lookup :|content_type| msg))
 
+(defun safe-size (size)
+  (let ((int (round size)))
+    (if (= int 0) 16 int)))
+
 (defun resolve-media (uri)
   "Takes a remote uri and returns the local path to that media object."
   (let* ((safe-uri (format-uri uri))
@@ -35,8 +39,14 @@
   "Converts millisecond Unix timestamps into human-readable dates"
   (let* ((unix (round (/ unix-milli 1000)))
 	 (universal (+ unix (encode-universal-time 0 0 0 1 1 1970 0))))
-    (multiple-value-bind (second minute hour date month year) (decode-universal-time universal)
-      (format nil "~D.~D.~D (~2,'0D:~2,'0D:~2,'0D)" year month date hour minute second))))
+    (multiple-value-bind (second minute hour day month year) (decode-universal-time universal)
+      (format nil "~D.~D.~D (~2,'0D:~2,'0D:~2,'0D)" year month day hour minute second))))
+
+(defun date-to-unix (date-str)
+  (let ((time-values (mapcar #'parse-integer (cl-ppcre:split "\\.|:|\\(|\\)" date-str)))
+	(unix-shift (encode-universal-time 0 0 0 1 1 1970 0)))
+    (multiple-value-bind (year month day hour minute second) (values-list time-values)
+      (* 1000 (- (encode-universal-time (or second 0) (or minute 0) (or hour 0) day month year) unix-shift)))))
 
 (defun kvlist-to-alist (lst)
   "Converts a list in (:key val :key2 val2) form to an alist"

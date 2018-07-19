@@ -11,34 +11,52 @@
     <meta charset=\"UTF-8\">
     <style>
       .convo {
-        width: 60%;
+        width: 90%;
         margin: auto;
       }
       .right {
         text-align: right;
         margin-left: 40%;
+        flex-direction: row;
       }
       .left {
         text-align: left;
         margin-right: 40%;
+        flex-direction: row-reverse;
+      }
+      .sender-name {
+        font-weight: bold;
       }
       img, video {
-        max-height: 15rem
+        max-width: 50%;
+        border-radius: 0.5rem;
       }
-      .message-container {
-        background-color: #89CFF0;
+      .message {
+        white-space: pre-wrap;
         border-radius: 1rem;
-        max-width: 60%;
-      }
-      .message-container * {
         padding: 0.5rem;
       }
-      .message-container:hover .timestamp {
-        display: block;
+      .right .message {
+        background-color: #89CFF0;
+      }
+      .left .message {
+        background-color: #77DD77;
       }
       .timestamp {
-        display: none;
+        margin-right: 0.5rem;
+        min-width: 10rem;
+        font-weight: lighter;
       }
+      .message-container {
+        max-width: 60%;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .message-container p {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+      }
+
     </style>
   </head>
   <body>
@@ -64,7 +82,7 @@
     (setf *last-sender* (cadr msg))
     (format html-stream "<div class=\"message-container ~A\">~%" (if (equal (cadr msg) "Me") "right" "left"))
     (cond ((eq (car msg) :text)
-	   (format html-stream "<p class=\"message\">~A</p>~%" (car (last msg))))
+	   (format html-stream "<p class=\"message\" style=\"font-size:~Apx\">~A</p>~%" (safe-size (cadddr msg)) (car (last msg))))
 	  ((member (car msg) '(:image :sticker))
 	   (format html-stream "<p><img src=\"~A\" alt=\"COULDN'T DISPLAY MEDIA\"></p>~%" (resolve-media (car (last msg)))))
 	  ((eq (car msg) :video)
