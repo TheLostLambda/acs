@@ -12,9 +12,8 @@
   "Returns the mime type of the message it's called on"
   (lookup :|content_type| msg))
 
-(defun safe-size (size)
-  (let ((int (round size)))
-    (if (= int 0) 16 int)))
+(defun msg-valid (msg)
+  (every (lambda (data) (or (not (stringp data)) (ensure-string-content data))) msg))
 
 (defun resolve-media (uri)
   "Takes a remote uri and returns the local path to that media object."
@@ -35,9 +34,9 @@
 	(concatenate 'string "/sdcard/" (subseq uri (length sdcard)))
 	uri)))
 
-(defun unix-to-date (unix-milli)
+(defun unix-to-date (unix-nano)
   "Converts millisecond Unix timestamps into human-readable dates"
-  (let* ((unix (round (/ unix-milli 1000)))
+  (let* ((unix (round (/ unix-nano 1000000)))
 	 (universal (+ unix (encode-universal-time 0 0 0 1 1 1970 0))))
     (multiple-value-bind (second minute hour day month year) (decode-universal-time universal)
       (format nil "~D.~D.~D (~2,'0D:~2,'0D:~2,'0D)" year month day hour minute second))))
@@ -46,7 +45,7 @@
   (let ((time-values (mapcar #'parse-integer (cl-ppcre:split "\\.|:|\\(|\\)" date-str)))
 	(unix-shift (encode-universal-time 0 0 0 1 1 1970 0)))
     (multiple-value-bind (year month day hour minute second) (values-list time-values)
-      (* 1000 (- (encode-universal-time (or second 0) (or minute 0) (or hour 0) day month year) unix-shift)))))
+      (* 1000000 (- (encode-universal-time (or second 0) (or minute 0) (or hour 0) day month year) unix-shift)))))
 
 (defun kvlist-to-alist (lst)
   "Converts a list in (:key val :key2 val2) form to an alist"

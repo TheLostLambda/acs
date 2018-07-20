@@ -15,6 +15,7 @@
 
 (defun mk-report (convo &optional start end)
   (db-connect)
-  (mapc #'adb-fetch-media (list-messages convo start end))
-  (write-to-file (gen-report (lookup convo (list-conversations)) (list-messages convo start end)))
+  (let ((msgs (list-messages convo start end)))
+    (mapc #'adb-fetch-media msgs)
+    (write-to-file (gen-report (lookup convo (list-conversations)) msgs)))
   (db-free))

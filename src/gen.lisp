@@ -31,6 +31,9 @@
         max-width: 50%;
         border-radius: 0.5rem;
       }
+      audio {
+        border-radius: 0.5rem;
+      }
       .message {
         white-space: pre-wrap;
         border-radius: 1rem;
@@ -56,7 +59,15 @@
         margin-top: 0.1rem;
         margin-bottom: 0.1rem;
       }
-
+      a {
+        text-decoration: none;
+      }
+      p {
+        font-family: \"Noto Sans\", Arial, sans-serif;
+      }
+      .media {
+        line-height: 0;
+      }
     </style>
   </head>
   <body>
@@ -71,22 +82,28 @@
 (defun gen-report (title msgs)
   (let ((html-stream (make-string-output-stream)))
     (format html-stream (car *html-wrapper*) title)
-    (mapc (lambda (msg) (princ (msg-to-html msg) html-stream)) msgs)
+    (mapc (lambda (msg) (unless (eq (car msg) :unsupported) (princ (msg-to-html msg) html-stream))) msgs)
     (format html-stream (cdr *html-wrapper*))
     (get-output-stream-string html-stream)))
 
 (defun msg-to-html (msg)
   (let ((html-stream (make-string-output-stream)))
     (unless (or (equal (cadr msg) *last-sender*) (equal (cadr msg) "Me"))
-      (format html-stream "<p class=\"sender-name\">~A</p>~%" (cadr msg))) ; Change this so these IDs display only in group messages
+      (format html-stream "<p class=\"sender-name\">~A</p>~%" (cadr msg)))
     (setf *last-sender* (cadr msg))
     (format html-stream "<div class=\"message-container ~A\">~%" (if (equal (cadr msg) "Me") "right" "left"))
     (cond ((eq (car msg) :text)
-	   (format html-stream "<p class=\"message\" style=\"font-size:~Apx\">~A</p>~%" (safe-size (cadddr msg)) (car (last msg))))
+	   (format html-stream "<p class=\"message\" style=\"font-size:~Apx\">~A</p>~%" (round (nth 3 msg)) (car (last msg))))
+	  ((eq (car msg) :document)
+	   (format html-stream "<p class=\"message\">Sent a file: <a href=\"~A\">~A</a></p>~%" (resolve-media (car (last msg))) (nth 3 msg)))
+	  ((eq (car msg) :location)
+	   (format html-stream "<p class=\"message\">Sent a location: ~A~%(~6$,~6$)</p>~%" (car (last msg)) (nth 3 msg) (nth 4 msg)))
 	  ((member (car msg) '(:image :sticker))
-	   (format html-stream "<p><img src=\"~A\" alt=\"COULDN'T DISPLAY MEDIA\"></p>~%" (resolve-media (car (last msg)))))
+	   (format html-stream "<p class=\"media\"><img src=\"~A\" alt=\"COULDN'T DISPLAY MEDIA\"></p>~%" (resolve-media (car (last msg)))))
 	  ((eq (car msg) :video)
-	   (format html-stream "<video controls><source src=\"~A\">COULDN'T DISPLAY MEDIA</video>" (resolve-media (car (last msg)))))
+	   (format html-stream "<p class=\"media\"><video controls><source src=\"~A\">COULDN'T DISPLAY MEDIA</video></p>~%" (resolve-media (car (last msg)))))
+	  ((eq (car msg) :audio)
+	   (format html-stream "<p class=\"media\"><audio controls><source src=\"~A\">COULDN'T DISPLAY MEDIA</audio></p>~%" (resolve-media (car (last msg)))))
 	  (t ""))
     (format html-stream "<p class=\"timestamp\">~A</p>~%" (caddr msg))
     (format html-stream "</div>~%")

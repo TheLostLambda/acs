@@ -6,12 +6,9 @@ parses it to generate a conversation log in searchable, single-page, html format
 Currently, this program requires a rooted Android device to pull the message database.
 
 ## Todo
-* Switch to `dbi:with-connection`
-* Support `application/pdf` with `uri` and `file_name` fields
-* Support `application/latlong` with `location_lat`, `location_lng`, and `location_address`
+* Allow the specification of report output directories
 * Add command line interface
 * Update docstrings
-* Reduce vertical message spacing
 * Convert animated webp to gif images
 
 ## Reverse Engineering
