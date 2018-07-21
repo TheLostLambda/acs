@@ -15,15 +15,26 @@
 (defun msg-valid (msg)
   (every (lambda (data) (or (not (stringp data)) (ensure-string-content data))) msg))
 
+(defun relative-path (path)
+  (merge-pathnames (uiop:parse-unix-namestring path) (uiop:getcwd)))
+
+(defun absolute-path (path)
+  (uiop:truenamize path))
+
+(defun write-to-file (report-str)
+  (with-open-file (fh (ensure-directories-exist (merge-pathnames "ACS.html" *output-dir*)) :direction :output :if-exists :supersede)
+    (write-string report-str fh)))
+
 (defun resolve-media (uri)
   "Takes a remote uri and returns the local path to that media object."
   (let* ((safe-uri (format-uri uri))
-	 (file-type (pathname-type safe-uri)))
+	 (file-type (pathname-type safe-uri))
+	 (media-dir (merge-pathnames "media/" *output-dir*)))
     (flet ((type-path (media type) (merge-pathnames media (concatenate 'string (pathname-name safe-uri) "." type))))
       (if file-type
-	  (when (probe-file (type-path *media-dir* file-type)) (type-path "media/" file-type))
-	  (cond ((probe-file (type-path *media-dir* "png")) (type-path "media/" "png"))
-		((probe-file (type-path *media-dir* "webp")) (type-path "media/" "webp"))
+	  (when (probe-file (type-path media-dir file-type)) (type-path "media/" file-type))
+	  (cond ((probe-file (type-path media-dir "png")) (type-path "media/" "png"))
+		((probe-file (type-path media-dir "webp")) (type-path "media/" "webp"))
 		(t nil))))))
 
 (defun format-uri (uri-str)

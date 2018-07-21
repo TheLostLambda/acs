@@ -6,7 +6,6 @@ parses it to generate a conversation log in searchable, single-page, html format
 Currently, this program requires a rooted Android device to pull the message database.
 
 ## Todo
-* Allow the specification of report output directories
 * Add command line interface
 * Update docstrings
 * Convert animated webp to gif images

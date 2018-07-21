@@ -1,6 +1,5 @@
 ;;;; This file contains the code used to generate the final html report.
 
-(defparameter *report-path* (merge-pathnames "ACS.html" *output-dir*))
 (defparameter *last-sender* nil)
 
 (defparameter *html-wrapper* '(
@@ -30,6 +29,7 @@
       img, video {
         max-width: 50%;
         border-radius: 0.5rem;
+        line-height: initial;
       }
       audio {
         border-radius: 0.5rem;
@@ -108,8 +108,3 @@
     (format html-stream "<p class=\"timestamp\">~A</p>~%" (caddr msg))
     (format html-stream "</div>~%")
     (get-output-stream-string html-stream)))
-
-(defun write-to-file (report-str)
-  (with-open-file (fh (ensure-directories-exist *report-path*) :direction :output :if-exists :supersede)
-    (write-string report-str fh)))
-
