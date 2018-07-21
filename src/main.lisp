@@ -8,7 +8,7 @@
 (load "db.lisp")
 (load "gen.lisp")
 
-(defparameter *VERSION-STRING* "v1.0.0" "The version information for the program.")
+(defparameter *VERSION-STRING* "v1.0.1" "The version information for the program.")
 (defparameter *output-dir* nil "This is the directory in which the final report will be written and the media pulled.")
 
 (defun conversations ()
@@ -57,8 +57,15 @@
 (defun get-typed-input (type prompt)
   "Takes a data type and prompt text then reads and validates input from the user. If the input doesn't validate as the type given, reprompt the user."
   (format t "~A: " prompt)
+  (finish-output)
   (let ((in (read-line)))
     (cond ((eq type 'optional) (ensure-string-content in))
           ((and (eq type 'string) (ensure-string-content in)) in)
 	  ((eq type 'integer) (handler-case (parse-integer in) (error () (get-typed-input type prompt))))
 	  (t (get-typed-input type prompt)))))
+
+(defun main ()
+  "Wraps the main cli and gracefully handles Ctrl-C interrupts."
+  (handler-case (cli)
+    (sb-sys:interactive-interrupt ()
+      (sb-ext:quit))))

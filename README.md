@@ -8,7 +8,7 @@ Currently, this program requires a rooted Android device to pull the message dat
 ## Build
 ```
 (load "main.lisp")
-(sb-ext:save-lisp-and-die "acs" :toplevel #'cli :executable t :compression 9)
+(sb-ext:save-lisp-and-die "acs" :toplevel #'main :executable t :compression 9)
 ```
 
 ## Todo
