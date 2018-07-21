@@ -6,9 +6,7 @@ parses it to generate a conversation log in searchable, single-page, html format
 Currently, this program requires a rooted Android device to pull the message database.
 
 ## Todo
-* Add command line interface
-* Update docstrings
-* Convert animated webp to gif images
+* Convert animated webp to gif images (or just cry and use Chromium)
 
 ## Reverse Engineering
 * Database located at: `/data/data/com.google.android.apps.fireball/databases/fireball.db`

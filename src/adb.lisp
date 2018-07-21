@@ -1,16 +1,16 @@
 ;;;; This file contains all of the code that handles interactions with adb and the filesystem
 
-(defparameter *REMOTE-DB-PATH* "/data/data/com.google.android.apps.fireball/databases/fireball.db")
-(defparameter *TEMP* (uiop:default-temporary-directory))
+(defparameter *REMOTE-DB-PATH* "/data/data/com.google.android.apps.fireball/databases/fireball.db" "This is the path to the Allo database on an Android phone.")
+(defparameter *TEMP* (uiop:default-temporary-directory) "This is the path to the operating system's temporary directory, where the database from the phone will be stored.")
 
 ;; This only works on rooted devices. To change that I would need to use `adb backup` then untar that archive.
 (defun adb-pull-database ()
-  "Pulls the message database from the phone by calling `adb pull`"
+  "Pulls the message database from the phone by calling `adb pull`."
   (uiop:run-program (list "adb" "pull" *REMOTE-DB-PATH* (namestring *TEMP*)) :output t))
 
 ;; Seriously, .webp is the bane of my existence...
 (defun adb-fetch-media (msg)
-  "Takes a message, checks its type, then uses adb to fetch any media that it might reference"
+  "Takes a message, checks its type, then uses adb to fetch any media that it might reference. It also performs limited file-type conversion."
   (when (member (car msg) '(:image :sticker :video :document :audio))
     (let ((uri (format-uri (car (last msg))))
 	  (media-dir (merge-pathnames "media/" *output-dir*))) 

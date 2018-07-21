@@ -1,6 +1,6 @@
 ;;;; This file contains the code used to generate the final html report.
 
-(defparameter *last-sender* nil)
+(defparameter *last-sender* nil "Tracks the last person who sent a message so repeat senders only have their name shown once.")
 
 (defparameter *html-wrapper* '(
 "<!DOCTYPE html>
@@ -77,9 +77,10 @@
 "    </div>
   </body>
 </html>
-"))
+") "This wrapper contains the shared html for all of the reports. This includes `<head>` data and the page's CSS.")
 
 (defun gen-report (title msgs)
+  "Generates an html report when given a list of messages. Builds the html using the wrapper and the repeated application of the `msg-to-html` function."
   (let ((html-stream (make-string-output-stream)))
     (format html-stream (car *html-wrapper*) title)
     (mapc (lambda (msg) (unless (eq (car msg) :unsupported) (princ (msg-to-html msg) html-stream))) msgs)
@@ -87,6 +88,7 @@
     (get-output-stream-string html-stream)))
 
 (defun msg-to-html (msg)
+  "Takes a single message and represents it in html. It checks the message type before rendering it appropriately."
   (let ((html-stream (make-string-output-stream)))
     (unless (or (equal (cadr msg) *last-sender*) (equal (cadr msg) "Me"))
       (format html-stream "<p class=\"sender-name\">~A</p>~%" (cadr msg)))
