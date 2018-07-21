@@ -5,6 +5,12 @@ parses it to generate a conversation log in searchable, single-page, html format
 
 Currently, this program requires a rooted Android device to pull the message database.
 
+## Build
+```
+(load "main.lisp")
+(sb-ext:save-lisp-and-die "acs" :toplevel #'cli :executable t :compression 9)
+```
+
 ## Todo
 * Convert animated webp to gif images (or just cry and use Chromium)
 
