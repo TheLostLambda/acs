@@ -12,6 +12,7 @@ Currently, this program requires a rooted Android device to pull the message dat
 ```
 
 ## Todo
+* Limit line width to 80 so default terminals fit all the text on screen
 * When output directories are entered, ensure they are actual directories
 * Convert animated webp to gif images (or just cry and use Chromium)
 
