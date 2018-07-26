@@ -4,9 +4,13 @@
   "Returns only the resultant value of an assoc call."
   (cdr (assoc key alist)))
 
+(defun trim-whitespace (str)
+  "Removes trailing whitespace from a string."
+  (string-trim '(#\Space #\Newline #\Tab) str))
+
 (defun ensure-string-content (str)
   "Returns NIL if the string is empty. Returns the string otherwise."
-  (unless (= (length (string-trim " " str)) 0) str))
+  (unless (= (length (trim-whitespace str)) 0) str))
 
 (defun msg-type (msg)
   "Returns the mime type of the message it's called on."
