@@ -12,6 +12,8 @@ Currently, this program requires a rooted Android device to pull the message dat
 ```
 
 ## Todo
+* Make seconds optional when giving a time
+* Make sure that the same stickers aren't being pulled multiple times
 * Display group chat names when they are set (when listing conversations)
 * Add support for backing up other chat applications
 * Add support for unrooted Android

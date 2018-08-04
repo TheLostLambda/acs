@@ -8,7 +8,7 @@
 (load "db.lisp")
 (load "gen.lisp")
 
-(defparameter *VERSION-STRING* "v1.1.0" "The version information for the program.")
+(defparameter *VERSION-STRING* "v1.1.1" "The version information for the program.")
 (defparameter *output-dir* nil "This is the directory in which the final report will be written and the media pulled.")
 
 (defun print-conversations ()
@@ -43,7 +43,7 @@
     (format t "To begin, enter the number of the conversation that you would like to archive.~%~%")
     (print-conversations)
     (terpri)
-    (push (cons :id (get-typed-input (is-bounded-integer 0 (length (list-conversations))) "Conversation ID")) options)
+    (push (cons :id (get-typed-input (is-conversation-id) "Conversation ID")) options)
     (format t "~%Would you like to archive the whole conversation?~%")
     (when (equalp "N" (get-typed-input (is-yesno) "(Y/N)"))
       (format t "~%Please enter a time range in the format YYYY.MM.DD (HH:MM:SS).~%")
@@ -103,7 +103,15 @@
   "Ensures input is an integer and within a range."
   (lambda (i)
     (let ((int (handler-case (parse-integer i) (error () nil))))
-      (if (and int (> int lb) (< int ub))
+      (if (and int (>= int lb) (<= int ub))
+	  int
+	  nil))))
+
+(defun is-conversation-id ()
+  "Ensures input is a valid conversation id."
+  (lambda (i)
+    (let ((int (handler-case (parse-integer i) (error () nil))))
+      (if (assoc int (list-conversations))
 	  int
 	  nil))))
 
