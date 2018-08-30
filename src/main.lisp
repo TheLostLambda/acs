@@ -8,7 +8,7 @@
 (load "db.lisp")
 (load "gen.lisp")
 
-(defparameter *VERSION-STRING* "v1.1.1" "The version information for the program.")
+(defparameter *VERSION-STRING* "v1.1.2" "The version information for the program.")
 (defparameter *output-dir* nil "This is the directory in which the final report will be written and the media pulled.")
 
 (defun print-conversations ()
@@ -119,7 +119,7 @@
   "Ensures input is in `YYYY.MM.DD` + ` (HH:MM:SS)` format."
   (lambda (i)
     (let ((safe-i (trim-whitespace i))
-	  (date-regex "^[0-9]{4}\.\\b([1-9]|1[0-2])\\b\.\\b([1-9]|2[0-9]|3[0-1])\\b")
+	  (date-regex "^[0-9]{4}\.\\b([1-9]|1[0-2])\\b\.\\b([1-9]|1[0-9]|2[0-9]|3[0-1])\\b")
 	  (time-regex " \\(\\b([0-1][0-9]|2[0-3])\\b(:\\b[0-5][0-9]\\b){2}\\)$"))
       (if (or (cl-ppcre:scan (concatenate 'string date-regex "$") safe-i)
 	      (cl-ppcre:scan (concatenate 'string date-regex time-regex) safe-i))
