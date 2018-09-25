@@ -8,7 +8,7 @@
 (load "db.lisp")
 (load "gen.lisp")
 
-(defparameter *VERSION-STRING* "v1.1.2" "The version information for the program.")
+(defparameter *VERSION-STRING* "v1.1.3" "The version information for the program.")
 (defparameter *output-dir* nil "This is the directory in which the final report will be written and the media pulled.")
 
 (defun print-conversations ()
@@ -46,7 +46,7 @@
     (push (cons :id (get-typed-input (is-conversation-id) "Conversation ID")) options)
     (format t "~%Would you like to archive the whole conversation?~%")
     (when (equalp "N" (get-typed-input (is-yesno) "(Y/N)"))
-      (format t "~%Please enter a time range in the format YYYY.MM.DD (HH:MM:SS).~%")
+      (format t "~%Please enter a time range in the format YYYY-MM-DD (HH:MM:SS).~%")
       (format t "Note that while providing the year, month, and day are required, the time~%components are optional.~%")
       (push (cons :start (get-typed-input (is-date) "Start time")) options)
       (push (cons :end (get-typed-input (optionally (is-date)) "End time (optional)")) options))
@@ -116,11 +116,11 @@
 	  nil))))
 
 (defun is-date ()
-  "Ensures input is in `YYYY.MM.DD` + ` (HH:MM:SS)` format."
+  "Ensures input is in `YYYY-MM-DD` + ` (HH:MM:SS)` format."
   (lambda (i)
     (let ((safe-i (trim-whitespace i))
-	  (date-regex "^[0-9]{4}\.\\b([1-9]|1[0-2])\\b\.\\b([1-9]|1[0-9]|2[0-9]|3[0-1])\\b")
-	  (time-regex " \\(\\b([0-1][0-9]|2[0-3])\\b(:\\b[0-5][0-9]\\b){2}\\)$"))
+	  (date-regex "^[0-9]{4}\-\\b(0[1-9]|1[0-2])\\b\-\\b(0[1-9]|1[0-9]|2[0-9]|3[0-1])\\b")
+	  (time-regex " \\(\\b([0-1][0-9]|2[0-3])\\b(:\\b[0-5][0-9]\\b){1,2}\\)$"))
       (if (or (cl-ppcre:scan (concatenate 'string date-regex "$") safe-i)
 	      (cl-ppcre:scan (concatenate 'string date-regex time-regex) safe-i))
 	  safe-i
